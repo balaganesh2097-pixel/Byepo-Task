@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id           String        @id @default(uuid()) @map("organization_id")
+  name         String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  users        User[]
+  featureFlags FeatureFlag[]
+
+  @@map("organization")
+}
+
+model User {
+  id             String        @id @default(uuid()) @map("user_id")
+  name           String
+  password       String
+  email          String        @unique
+  role           Role          @default(USER)
+  organizationId String?       @map("organization_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  deleted        Boolean       @default(false)
+
+  @@map("user")
+}
+
+model FeatureFlag {
+  id             String       @id @default(uuid()) @map("feature_flag_id")
+  key            String
+  isEnabled      Boolean      @default(false) @map("is_enabled")
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@unique([key, organizationId])
+  @@map("feature_flag")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
