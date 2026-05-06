@@ -1,5 +1,5 @@
 {
-  "name": "theend",
+  "name": "byepo-task",
   "packageManager": "yarn@4.14.1",
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
